@@ -3,6 +3,7 @@ import functools
 import os
 print(os.getcwd())
 
+
 def timing_decorator(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
@@ -31,6 +32,7 @@ def read_and_write_numbers():
         file.write(f"The sum of {a} and {b} is {result}\n")   
     print(f"The result has been written to output.txt")
     return result
+
 
 #Тест
 calculate_sum(5, 3)
