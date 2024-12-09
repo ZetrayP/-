@@ -1,18 +1,16 @@
-version: '3.8'
-
 services:
-  db:
-    image: nouchka/sqlite3
-    volumes:
-      - ./data:/data
-    environment:
-      - DATABASE_URL=${DATABASE_URL}
-  
-  web:
-    build: .
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
-    depends_on:
-      - db
+    volumes:
+      - ./app:/app  
+      - sqlite_data:/app  
     env_file:
-      - .env
+      - .env.example  
+    restart: always  
+
+volumes:
+  sqlite_data:  
