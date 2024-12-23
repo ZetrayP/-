@@ -67,7 +67,6 @@ def group_students(session: Session):
         session.add(student)
     session.commit()
 
-
 def transfer_student(session: Session, student_id: int, new_group_id: int):
     student = session.get(Student, student_id)
     if student:

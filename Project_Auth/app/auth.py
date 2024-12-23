@@ -41,8 +41,7 @@ def create_refresh_token(data: dict):
 def register(user: UserCreate, session: Session = Depends(get_session)):
     db_user = session.query(User).filter(User.email == user.email).first()
     if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    
+        raise HTTPException(status_code=400, detail="Email already registered")    
     try:
         hashed_password = pwd_context.hash(user.password)
         db_user = User(email=user.email, hashed_password=hashed_password)
@@ -58,16 +57,13 @@ def register(user: UserCreate, session: Session = Depends(get_session)):
 def login(user: UserCreate, session: Session = Depends(get_session)):
     db_user = session.query(User).filter(User.email == user.email).first()
     if not db_user or not pwd_context.verify(user.password, db_user.hashed_password):
-        raise HTTPException(status_code=400, detail="Invalid credentials")
-    
+        raise HTTPException(status_code=400, detail="Invalid credentials")   
     login_history = LoginHistory(user_id=db_user.id, user_agent="User-Agent Info")
     session.add(login_history)
-    session.commit()
-    
+    session.commit() 
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(data={"sub": db_user.email}, expires_delta=access_token_expires)
-    refresh_token = create_refresh_token(data={"sub": db_user.email})
-    
+    refresh_token = create_refresh_token(data={"sub": db_user.email})= 
     return {"detail": "Login successful", "access_token": access_token, "refresh_token": refresh_token}
 
 @router.post("/refresh")
@@ -87,10 +83,8 @@ def refresh_token(refresh_token: str, session: Session = Depends(get_session)):
         session.commit()
     except JWTError:
         raise credentials_exception
-    
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     new_access_token = create_access_token(data={"sub": email}, expires_delta=access_token_expires)
-    
     return {"detail": "Token refreshed successfully", "access_token": new_access_token}
 
 @router.put("/user/update", response_model=UserOut)
@@ -98,7 +92,6 @@ def update_user(user: UserUpdate, session: Session = Depends(get_session)):
     db_user = session.query(User).filter(User.email == user.email).first()
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
-    
     db_user.hashed_password = pwd_context.hash(user.password)
     session.commit()
     return {"detail": "User data updated successfully", "user": db_user}
@@ -114,9 +107,7 @@ def logout(refresh_token: str, session: Session = Depends(get_session)):
         payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
-    
     token_blacklist = TokenBlacklist(token=refresh_token)
     session.add(token_blacklist)
     session.commit()
-    
     return {"detail": "User logged out successfully"}

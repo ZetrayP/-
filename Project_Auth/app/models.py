@@ -17,12 +17,10 @@ class LoginHistory(SQLModel, table=True):
     user_id: int = Field(foreign_key="user.id")
     user_agent: str
     login_time: datetime = Field(default=get_utc_now)
-
     user: Optional[User] = Relationship(back_populates="login_history")
 
 class TokenBlacklist(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id")
     token: str = Field(index=True)
-
     user: Optional[User] = Relationship(back_populates="tokens")
